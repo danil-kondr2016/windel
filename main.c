@@ -5,7 +5,6 @@
 #include <tchar.h>
 #include <stdlib.h>
 
-#include "utils.h"
 #include "errmsg.h"
 #include "startdlg.h"
 #include "windel.h"
