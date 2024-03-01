@@ -27,12 +27,10 @@ void ErrorMessage(HINSTANCE thisInstance)
 		);
 		if ((answer == IDCANCEL) || (answer == IDNO)) {
 			nAttempts++;
-			if (nAttempts < MAX_N_ATTEMPTS) {
-				MessageBox(
-				    NULL, szDeclineMessage,
-				    szErrorTitle, MB_SYSTEMMODAL
-				);
-			}
+			MessageBox(
+			    NULL, szDeclineMessage,
+			    szErrorTitle, MB_SYSTEMMODAL
+			);
 			continue;
 		}
 	}
