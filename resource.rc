@@ -1,0 +1,30 @@
+#include <winres.h>
+#include <commctrl.h>
+#include "resource.h"
+
+LANGUAGE LANG_RUSSIAN, SUBLANG_DEFAULT
+IDD_START DIALOG 0, 0, 200, 80
+STYLE DS_CENTER | DS_MODALFRAME | DS_SHELLFONT | WS_VISIBLE | WS_POPUP
+EXSTYLE WS_EX_WINDOWEDGE | WS_EX_TOPMOST
+FONT 8, "Ms Shell Dlg"
+{
+    CTEXT           "Процесс удаления Windows начнётся через 3 секунды.", IDC_START_TEXT, 0, 0, 200, 80, SS_CENTER | SS_CENTERIMAGE, WS_EX_LEFT
+}
+
+LANGUAGE LANG_RUSSIAN, SUBLANG_DEFAULT
+STRINGTABLE
+{
+    IDS_ERROR_MSG                 "Ваша копия ОС Windows признана нелицензионной и подлежит удалению в течение 10 минут.\nПродолжить?"
+    IDS_DECLINE_MSG               "Использование нелицензионной операционной системы незаконно, поэтому Вы не имеете права отказаться от данной процедуры."
+    IDS_END_MSG                   "Удаление Windows завершено.\n\nДля продолжения необходима перезагрузка."
+    IDS_ERROR_TITLE               "Ошибка Windows"
+    IDS_DELETING_TITLE            "Удаление Windows"
+    IDS_DELETING_MSG              "Удаление Windows..."
+    IDS_JUST_JOKE                 "Это была всего лишь шутка! С 1 Апреля!"
+}
+
+LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
+IDI_INSTALL          ICON         "./install.ico"
+
+LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
+1                  RT_MANIFEST    "./manifest.xml"

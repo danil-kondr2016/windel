@@ -1,0 +1,10 @@
+#define IDI_INSTALL                             1
+#define IDC_START_TEXT                          101
+#define IDD_START                               205
+#define IDS_ERROR_MSG                           40000
+#define IDS_DECLINE_MSG                         40001
+#define IDS_END_MSG                             40002
+#define IDS_ERROR_TITLE                         40003
+#define IDS_DELETING_TITLE                      40004
+#define IDS_DELETING_MSG                        40005
+#define IDS_JUST_JOKE                           40006
