@@ -13,14 +13,28 @@
 #define DWWM_DELETEEND  0x2002
 #define DWWM_REBOOT     0x2003
 
-HWND hProgressBar, hProcessStateText, hPercents;
-HWND hMainWindow;
-
+HWND hProgressBar, hProcessStateText, hPercents, hMainWindow;
 HDESK hOldDesk, hNewDesk;
-
 NONCLIENTMETRICS metrics = {0};
 
 TCHAR szWindowClass[] = _T("DeletingWindow");
+
+#define WIDTH   208
+#define HEIGHT  108
+
+#define PROCESS_STATE_TEXT_HEIGHT 40
+#define PROGRESS_BAR_HEIGHT       9
+#define PERCENTS_HEIGHT           10
+
+#define LMARGIN 8
+#define RMARGIN 8
+#define TMARGIN 8
+#define BMARGIN 8
+
+RECT rcMargin;
+COORD cProgressBar, cProcessStateText, cPercents;
+SIZE sMainWindow, sProgressBar, sProcessStateText, sPercents;
+SIZE sBaseUnits;
 
 int cx, cy;
 int width = 480, height = 300;
@@ -87,15 +101,7 @@ DWORD delete_windows(HINSTANCE hThisInstance)
 		return 1;
 	}
 
-	metrics.cbSize = sizeof(NONCLIENTMETRICS);
-	SystemParametersInfo(
-		SPI_GETNONCLIENTMETRICS,
-		sizeof(NONCLIENTMETRICS), &metrics,
-		0
-	);
-	cx = GetSystemMetrics(SM_CXSCREEN) >> 1;
-	cy = GetSystemMetrics(SM_CYSCREEN) >> 1;
-	
+
 	hMainWindow = create_window(hThisInstance);
 
 	ShowWindow(hMainWindow, SW_SHOW);
@@ -150,38 +156,83 @@ static void windel_end(HWND hWindow)
 	SetTimer(hWindow, 0, 2000, NULL);
 }
 
-static void windel_create(HWND hWindow)
+static void get_process_state_text_size(void);
+static void get_progress_bar_size(void);
+static void get_percents_size(void);
+
+static void get_size(HWND hWindow)
 {
-	HMENU system_menu;
-	HFONT hDialogFont;
-	TCHAR szDeletingMessage[1024];
+	RECT rect;
 
-	system_menu = GetSystemMenu(hWindow, FALSE);
-	EnableMenuItem(system_menu, SC_CLOSE, MF_DISABLED | MF_GRAYED);
+	GetClientRect(hWindow, &rect);
+	sMainWindow.cx = rect.right;
+	sMainWindow.cy = rect.bottom;
 
-	hDialogFont = CreateFontIndirect(&metrics.lfMessageFont);
+	get_process_state_text_size();
+	get_progress_bar_size();
+	get_percents_size();
+}
 
+static void get_process_state_text_size(void)
+{
+	sProcessStateText.cx = sMainWindow.cx - rcMargin.left - rcMargin.right;
+	sProcessStateText.cy = MulDiv(PROCESS_STATE_TEXT_HEIGHT, sBaseUnits.cy, 8);
+
+	cProcessStateText.X = rcMargin.left;
+	cProcessStateText.Y = rcMargin.top;
+}
+
+static void get_progress_bar_size(void)
+{
+	sProgressBar.cx = sMainWindow.cx - rcMargin.left - rcMargin.right;
+	sProgressBar.cy = MulDiv(PROGRESS_BAR_HEIGHT, sBaseUnits.cy, 8);
+
+	cProgressBar.X = rcMargin.left;
+	cProgressBar.Y = sMainWindow.cy - rcMargin.right 
+		- sProgressBar.cy;
+}
+
+static void get_percents_size(void)
+{
+	sPercents.cx = sMainWindow.cx - rcMargin.left - rcMargin.right;
+	sPercents.cy = MulDiv(PERCENTS_HEIGHT, sBaseUnits.cy, 8);
+
+	cPercents.X = rcMargin.left;
+	cPercents.Y = cProgressBar.Y - sBaseUnits.cy/8 - sPercents.cy;
+}
+
+static void create_progress_bar(HWND hWindow)
+{
 	hProgressBar = CreateWindowEx(
 		0,
 		PROGRESS_CLASS,
-		_T(""),
+		NULL,
 		WS_CHILD | WS_VISIBLE,
-		25, height-75,
-		width-50, 20,
+		cProgressBar.X, cProgressBar.Y,
+		sProgressBar.cx, sProgressBar.cy,
 		hWindow, NULL,
 		hInstance, NULL
 	);
+
 	SendMessage(hProgressBar, PBM_SETRANGE, 0, MAKELPARAM(0, 100));
 	SendMessage(hProgressBar, PBM_SETSTEP, 1, 0);
+}
+
+static void create_progress_state_text(HWND hWindow, HFONT hDialogFont)
+{
+	TCHAR szDeletingMessage[1024];
 
 	LoadString(hInstance, IDS_DELETING_MSG, szDeletingMessage, 1024);
+
 	hProcessStateText = CreateWindowEx(
 		0,
 		WC_STATIC,
 		szDeletingMessage,
 		WS_CHILD | WS_VISIBLE | SS_LEFT,
-		25, 25,
-		width - 50, 100,
+		cProcessStateText.X,
+		cProcessStateText.Y,
+		sProcessStateText.cx,
+		sProcessStateText.cy,
 		hWindow, NULL,
 		hInstance, NULL
 	);
@@ -189,21 +240,42 @@ static void windel_create(HWND hWindow)
 		hProcessStateText, WM_SETFONT,
 		(WPARAM)hDialogFont, FALSE
 	);
+}
 
+static void create_percents_text(HWND hWindow, HFONT hDialogFont)
+{
 	hPercents = CreateWindowEx(
 		0,
 		WC_STATIC,
 		_T("0%"),
 		WS_CHILD | WS_VISIBLE | SS_CENTER,
-		25, height-95,
-		width - 50, 20,
+		cPercents.X,
+		cPercents.Y,
+		sPercents.cx,
+		sPercents.cy,
 		hWindow, NULL,
 		hInstance, NULL
 	);
 	SendMessage(hPercents, WM_SETFONT, (WPARAM)hDialogFont, FALSE);
+}
+
+static void windel_create(HWND hWindow)
+{
+	HMENU system_menu;
+	HFONT hDialogFont;
+
+	get_size(hWindow);
+
+	system_menu = GetSystemMenu(hWindow, FALSE);
+	EnableMenuItem(system_menu, SC_CLOSE, MF_DISABLED | MF_GRAYED);
+
+	hDialogFont = CreateFontIndirect(&metrics.lfMessageFont);
+
+	create_progress_bar(hWindow);
+	create_progress_state_text(hWindow, hDialogFont);
+	create_percents_text(hWindow, hDialogFont);
 
 	SendMessage(hWindow, DWWM_INITDELETE, 0, 0);
-
 }
 
 static
@@ -256,10 +328,51 @@ static ATOM register_class(HINSTANCE hThisInstance)
 	return RegisterClassEx(&wndClass);
 }
 
+static void calculate_window_size(void)
+{
+	LONG lBaseUnits;
+	WORD wBaseX, wBaseY;
+
+	lBaseUnits = GetDialogBaseUnits();
+	wBaseX = LOWORD(lBaseUnits);
+	wBaseY = HIWORD(lBaseUnits);
+
+	rcMargin.left = MulDiv(LMARGIN, wBaseX, 4);
+	rcMargin.right = MulDiv(RMARGIN, wBaseX, 4);
+	rcMargin.top = MulDiv(TMARGIN, wBaseY, 8);
+	rcMargin.bottom = MulDiv(BMARGIN, wBaseY, 8);
+
+	sMainWindow.cx = MulDiv(WIDTH, wBaseX, 4);
+	sMainWindow.cy = MulDiv(HEIGHT, wBaseY, 8);
+
+	sBaseUnits.cx = wBaseX;
+	sBaseUnits.cy = wBaseY;
+}
+
+static void init_metrics(void)
+{
+	metrics.cbSize = sizeof(NONCLIENTMETRICS);
+	SystemParametersInfo(
+		SPI_GETNONCLIENTMETRICS,
+		sizeof(NONCLIENTMETRICS), &metrics,
+		0
+	);
+}
+
+static void get_center(void)
+{
+	cx = GetSystemMetrics(SM_CXSCREEN) >> 1;
+	cy = GetSystemMetrics(SM_CYSCREEN) >> 1;
+}
+
 static HWND create_window(HINSTANCE hThisInstance)
 {
 	TCHAR szWindowTitle[256];
-	
+
+	init_metrics();
+	get_center();
+	calculate_window_size();
+
 	hInstance = hThisInstance;
 	
 	LoadString(hThisInstance, IDS_DELETING_TITLE, szWindowTitle, 256);
@@ -267,11 +380,12 @@ static HWND create_window(HINSTANCE hThisInstance)
 		WS_EX_TOPMOST | WS_EX_WINDOWEDGE,
 		szWindowClass, szWindowTitle,
 		WS_OVERLAPPEDWINDOW
-	 & ~WS_THICKFRAME
-	 & ~WS_MAXIMIZEBOX
-	 & ~WS_MINIMIZEBOX,
-		cx - (width >> 1), cy - (height >> 1) - (metrics.iCaptionHeight << 1),
-		width, height,
+	      &~WS_THICKFRAME
+	      &~WS_MAXIMIZEBOX
+	      &~WS_MINIMIZEBOX,
+		cx - (sMainWindow.cx >> 1), 
+		cy - (sMainWindow.cy >> 1) - (metrics.iCaptionHeight << 1),
+		sMainWindow.cx, sMainWindow.cy,
 		NULL, NULL, hThisInstance, NULL
 	);
 }
