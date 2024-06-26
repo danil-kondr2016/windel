@@ -6,7 +6,6 @@
 #include <stdlib.h>
 
 #include "errmsg.h"
-#include "startdlg.h"
 #include "windel.h"
 #include "resource.h"
 
@@ -20,7 +19,6 @@ int WINAPI _tWinMain(
 {
 	InitCommonControls();
 	ErrorMessage(thisInstance);
-	StartDialog(thisInstance);
 
 	return DeleteWindows(thisInstance);
 }

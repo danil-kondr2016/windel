@@ -7,7 +7,7 @@ LDLIBS=-lgdi32 \
 	-lkernel32 \
 	-lcomctl32
 
-WinDel.exe: main.o resource.o errmsg.o windel.o startdlg.o
+WinDel.exe: main.o resource.o errmsg.o windel.o 
 	$(CC) -o $@ $(LDFLAGS) $^ $(LDLIBS)
 
 resource.o: resource.rc
