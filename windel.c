@@ -108,7 +108,7 @@ windel_callback(
 	switch (uMsg) {
 	case TDN_CREATED:
 		state->hTaskDialog = hWnd;
-		SendMessage(hWnd, TDM_ENABLE_BUTTON, IDOK, 0);
+		SendMessage(hWnd, TDM_ENABLE_BUTTON, IDCANCEL, 0);
 		SendMessage(state->hTaskDialog, TDM_SET_PROGRESS_BAR_RANGE, 
 			0, MAKELPARAM(0, state->nTotal));
 		ReleaseSemaphore(state->hTDSync, 1, NULL);
@@ -142,6 +142,7 @@ DWORD windel_window(struct WinDelState *state)
 	tdcfg.cbSize = sizeof(tdcfg);
 	tdcfg.hInstance = state->hInstance;
 	tdcfg.dwFlags = TDF_SHOW_PROGRESS_BAR | TDF_CALLBACK_TIMER;
+	tdcfg.dwCommonButtons = TDCBF_CANCEL_BUTTON;
 	tdcfg.pszWindowTitle = MAKEINTRESOURCE(IDS_DELETING_TITLE);
 	tdcfg.pszMainInstruction = MAKEINTRESOURCE(IDS_DELETING_MSG);
 	tdcfg.pfCallback = windel_callback;
