@@ -8,3 +8,4 @@
 #define IDS_DELETING_TITLE                      40004
 #define IDS_DELETING_MSG                        40005
 #define IDS_JUST_JOKE                           40006
+#define IDS_ERROR_MAIN_INSTR                    40007
