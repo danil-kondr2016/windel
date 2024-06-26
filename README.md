@@ -41,4 +41,4 @@ Windows/совокупность этих средств и прочее). В и
 
 **N.B.** 26.06.2024 я добавил ещё одну версию программы, которая
 выполнена на TaskDialog'ах вместо MessageBox'ов. Она содержится в ветке
-(task_dialogs)[https://github.com/danil-kondr2016/windel/tree/task_dialogs].
+[task_dialogs](https://github.com/danil-kondr2016/windel/tree/task_dialogs).
