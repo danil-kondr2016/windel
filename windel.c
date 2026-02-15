@@ -63,7 +63,7 @@ int DeleteWindows(HINSTANCE hThisInstance)
 	hWinDelThreads[0] = CreateThread(
 		NULL,
 		0,
-		windel_window,
+		(LPTHREAD_START_ROUTINE)windel_window,
 		state,
 		0,
 		NULL);
@@ -71,7 +71,7 @@ int DeleteWindows(HINSTANCE hThisInstance)
 	hWinDelThreads[1] = CreateThread(
 		NULL,
 		0,
-		delete_windows,
+		(LPTHREAD_START_ROUTINE)delete_windows,
 		state,
 		0,
 		NULL);
@@ -122,7 +122,7 @@ windel_callback(
 				state->nTotal, 0);
 			SendMessage(hWnd, TDM_SET_ELEMENT_TEXT, 
 					TDE_MAIN_INSTRUCTION,
-					MAKEINTRESOURCE(IDS_END_MSG));
+					(LPARAM)MAKEINTRESOURCE(IDS_END_MSG));
 			state->bEnd = TRUE;
 			return S_FALSE;
 		}
@@ -146,7 +146,7 @@ DWORD windel_window(struct WinDelState *state)
 	tdcfg.pszWindowTitle = MAKEINTRESOURCE(IDS_DELETING_TITLE);
 	tdcfg.pszMainInstruction = MAKEINTRESOURCE(IDS_DELETING_MSG);
 	tdcfg.pfCallback = windel_callback;
-	tdcfg.lpCallbackData = state;
+	tdcfg.lpCallbackData = (LONG_PTR)state;
 	
 	init_desktops(state);
 	switch_desk(state);

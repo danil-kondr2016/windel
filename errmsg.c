@@ -23,7 +23,7 @@ ErrorMessageTaskDialogCallback(
 			SendMessage(hWnd, TDM_ENABLE_BUTTON, IDNO, 0);
 			SendMessage(hWnd, TDM_ENABLE_BUTTON, IDCLOSE, 0);
 			SendMessage(hWnd, TDM_SET_ELEMENT_TEXT, TDE_CONTENT,
-					MAKEINTRESOURCE(IDS_DECLINE_MSG));
+				(LPARAM)MAKEINTRESOURCE(IDS_DECLINE_MSG));
 			return S_FALSE;
 		}
 		else
