@@ -69,8 +69,8 @@ int DeleteWindows(HINSTANCE hThisInstance)
 	hThread = CreateThread(
 		NULL,
 		0,
-		delete_windows,
-		hThisInstance,
+		(LPTHREAD_START_ROUTINE)delete_windows,
+		(LPVOID)hThisInstance,
 		0,
 		NULL);
 
